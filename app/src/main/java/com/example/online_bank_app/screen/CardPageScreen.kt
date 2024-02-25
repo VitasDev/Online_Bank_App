@@ -2,6 +2,7 @@ package com.example.online_bank_app.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -19,12 +20,13 @@ import com.example.online_bank_app.ui.theme.HomeBackground
 import com.example.online_bank_app.viewmodel.MainViewModel
 
 @Composable
-fun CardPageScreen(viewModel: MainViewModel, navHostController: NavHostController) {
+fun CardPageScreen(viewModel: MainViewModel, navHostController: NavHostController, padding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .background(HomeBackground),
+            .background(HomeBackground)
+            .padding(padding)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(12.dp))
@@ -34,6 +36,6 @@ fun CardPageScreen(viewModel: MainViewModel, navHostController: NavHostControlle
         Spacer(modifier = Modifier.height(16.dp))
         FeatureSection()
         Spacer(modifier = Modifier.height(24.dp))
-        TransactionCardSection()
+        TransactionCardSection(viewModel = viewModel)
     }
 }

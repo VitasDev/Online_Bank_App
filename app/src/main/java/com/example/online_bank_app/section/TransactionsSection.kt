@@ -27,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -51,8 +53,7 @@ fun TransactionsSection(viewModel: MainViewModel) {
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .fillMaxWidth()
-            .height(240.dp)
+            .fillMaxSize()
     ) {
         Row(
             modifier = Modifier
@@ -152,16 +153,17 @@ fun TransactionItem(
     transaction: Transaction
 ) {
     var imageProfile = painterResource(id = R.drawable.ic_arrow_down_left)
-    if (transaction.card != null && transaction.card!!.cardHolder.logoUrl != null) {
+    if (transaction.card != null) {
         imageProfile = rememberImagePainter(data = transaction.card.cardHolder.logoUrl)
     }
 
-    var imageStatusPayment = painterResource(id = R.drawable.ic_status_payment_failed)
-    if (transaction.status == "Success") {
-        imageStatusPayment = painterResource(id = R.drawable.ic_status_payment_success)
+    val imageStatusPayment = if (transaction.type == "Transfer") {
+        painterResource(id = R.drawable.ic_status_payment_failed)
+    } else {
+        painterResource(id = R.drawable.ic_status_payment_success)
     }
 
-    val transactionName = if (transaction.card != null && transaction.card!!.cardName != null) {
+    val transactionName = if (transaction.card != null) {
         transaction.card.cardName
     } else {
         transaction.merchant.name
@@ -174,16 +176,33 @@ fun TransactionItem(
         .scale(1.2f)
 
     val modifierProfile =
-        if (transaction.card != null && transaction.card!!.cardHolder.logoUrl != null) {
+        if (transaction.card != null) {
             modifierServerImage
         } else {
             modifierDefaultImage
         }
 
-    val cardLast4Number = if (transaction.card != null && transaction.card.cardLast4 != null) {
-        transaction.card.cardLast4.toString()
+    val cardLast4Number = if (transaction.card != null) {
+        transaction.card.cardLast4
     } else {
-        transaction.account.accountLast4.toString()
+        transaction.account.accountLast4
+    }.toString()
+
+    val transformedAmount = convertNumberToRequiredType(transaction.amount).toString()
+
+    val amount = if (transformedAmount.toFloat() > 0.0)
+        "$$transformedAmount"
+    else
+        transformedAmount.replace("-", "-$")
+
+    val amountColor = if (transaction.amount > 0.0) {
+        GreenAmount
+    } else {
+        if (transaction.type == "Withdraw") {
+            GrayArrow
+        } else {
+            ToolbarBlack
+        }
     }
 
     Row(
@@ -194,11 +213,23 @@ fun TransactionItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Image(
-            painter = imageProfile,
-            contentDescription = null,
-            modifier = modifierProfile
-        )
+        Box(modifier = Modifier.size(41.dp)) {
+            Image(
+                painter = imageProfile,
+                contentDescription = null,
+                modifier = modifierProfile
+            )
+
+            if (transaction.type == "Withdraw") {
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(RedWarning)
+                        .align(Alignment.BottomEnd)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.width(12.dp))
 
@@ -213,26 +244,40 @@ fun TransactionItem(
                 fontWeight = FontWeight.Medium,
                 color = ToolbarBlack,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
 
             Row(
-                modifier = Modifier
-                    .padding(top = 2.dp)
+                modifier = Modifier.padding(top = 1.dp)
             ) {
                 Text(
                     text = "•• ",
                     fontSize = 12.sp,
                     fontFamily = inter,
                     fontWeight = FontWeight.Medium,
-                    color = GrayArrow
+                    color = GrayArrow,
+                    style = TextStyle(
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        )
+                    )
                 )
                 Text(
                     text = cardLast4Number,
                     fontSize = 12.sp,
                     fontFamily = inter,
                     fontWeight = FontWeight.Medium,
-                    color = GrayArrow
+                    color = GrayArrow,
+                    style = TextStyle(
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        )
+                    )
                 )
             }
         }
@@ -240,20 +285,33 @@ fun TransactionItem(
         Text(
             modifier = Modifier
                 .weight(1f),
-            text = transaction.amount.toString(),
+            text = amount,
             fontSize = 16.sp,
             fontFamily = inter,
             fontWeight = FontWeight.Medium,
-            color = if (transaction.amount > 0.0) GreenAmount else ToolbarBlack,
-            textAlign = TextAlign.End
+            color = amountColor,
+            textAlign = TextAlign.End,
+            style = if (transaction.type == "Withdraw") TextStyle(textDecoration = TextDecoration.LineThrough) else TextStyle()
         )
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Icon(
-            painter = imageStatusPayment,
-            contentDescription = null,
-            tint = Color.Unspecified
-        )
+        Box(modifier = Modifier.size(24.dp)) {
+            if (transaction.type != "Withdraw") {
+                Icon(
+                    painter = imageStatusPayment,
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+            }
+        }
+    }
+}
+
+fun convertNumberToRequiredType(value: Float): Any {
+    return if (value % 1 == 0f) {
+        value.toInt()
+    } else {
+        value
     }
 }

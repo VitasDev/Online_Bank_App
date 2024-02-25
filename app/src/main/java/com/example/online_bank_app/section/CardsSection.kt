@@ -167,6 +167,7 @@ fun CardItem(
             .fillMaxWidth()
             .clickable {
                 viewModel.setDataCard(card)
+                viewModel.getCardTransactions(card.id)
                 navHostController.navigate("Card_Page")
             },
         verticalAlignment = Alignment.CenterVertically

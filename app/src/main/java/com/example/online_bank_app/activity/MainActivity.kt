@@ -1,6 +1,7 @@
 package com.example.online_bank_app.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.online_bank_app.api.CardTransactionApiState
+import com.example.online_bank_app.api.TransactionApiState
 import com.example.online_bank_app.section.BottomNavigationBar
 import com.example.online_bank_app.screen.CardPageScreen
 import com.example.online_bank_app.screen.MainPageScreen
@@ -61,16 +64,15 @@ fun HomeScreen(viewModel: MainViewModel) {
             BottomNavigationBar()
         }
     ) { padding ->
-            val navController = rememberNavController()
+        val navController = rememberNavController()
 
-            NavHost(navController = navController, startDestination = "Main_Page"){
-                composable("Main_Page"){
-                    MainPageScreen(viewModel = viewModel, navHostController = navController)
-                }
-                composable("Card_Page"){
-                    CardPageScreen(viewModel = viewModel, navHostController = navController)
-                }
+        NavHost(navController = navController, startDestination = "Main_Page") {
+            composable("Main_Page") {
+                MainPageScreen(viewModel = viewModel, navHostController = navController, padding)
             }
+            composable("Card_Page") {
+                CardPageScreen(viewModel = viewModel, navHostController = navController, padding)
+            }
+        }
     }
 }
-

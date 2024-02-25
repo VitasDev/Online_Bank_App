@@ -2,6 +2,7 @@ package com.example.online_bank_app.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -18,12 +19,14 @@ import com.example.online_bank_app.ui.theme.HomeBackground
 import com.example.online_bank_app.viewmodel.MainViewModel
 
 @Composable
-fun MainPageScreen(viewModel: MainViewModel, navHostController: NavHostController) {
+fun MainPageScreen(viewModel: MainViewModel, navHostController: NavHostController, padding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .background(HomeBackground)
+            .padding(padding)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp)
     ) {
         ToolbarMainSection()
         Spacer(modifier = Modifier.height(24.dp))

@@ -19,6 +19,7 @@
             android:name=".activity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Online_Bank_App">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
